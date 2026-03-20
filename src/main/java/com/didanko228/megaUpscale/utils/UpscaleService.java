@@ -1,7 +1,6 @@
 package com.didanko228.megaUpscale.utils;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -19,10 +18,10 @@ public class UpscaleService {
     /**
      * upscale
      *
-     * @param input     input file
-     * @param output    output file
+     * @param input     input photo
+     * @param output    output photo
      * @param modelName model name (example, 4xLSDIR)
-     * @param scale     scale (2,3,4)
+     * @param scale     scale (2, 3, 4)
      */
     public void upscale(Path input, Path output, String modelName, int scale) throws IOException, InterruptedException {
 
