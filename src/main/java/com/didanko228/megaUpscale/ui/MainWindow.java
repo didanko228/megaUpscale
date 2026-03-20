@@ -88,9 +88,16 @@ public class MainWindow extends Application {
                         // System.out -> loggerBridge
                         java.io.PrintStream originalOut = System.out;
                         System.setOut(new java.io.PrintStream(new java.io.OutputStream() {
+                            private StringBuilder buffer = new StringBuilder();
+
                             @Override
                             public void write(int b) {
-                                loggerBridge.log(String.valueOf((char) b));
+                                if (b == '\n') {
+                                    loggerBridge.log(buffer.toString());
+                                    buffer.setLength(0);
+                                } else {
+                                    buffer.append((char) b);
+                                }
                             }
                         }));
 
