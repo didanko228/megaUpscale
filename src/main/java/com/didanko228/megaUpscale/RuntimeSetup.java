@@ -18,23 +18,6 @@ import java.util.jar.JarFile;
 import static com.didanko228.megaUpscale.utils.OperatingSystemDetector.detectOS;
 
 public class RuntimeSetup {
-    public static Path jarDir() {
-        try {
-            return Path.of(RuntimeSetup.class
-                    .getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .toURI()).getParent();
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot determine JAR directory", e);
-        }
-    }
-
-    public static void ensureWritable(Path dir) throws IOException {
-        Files.createDirectories(dir);
-        Path test = Files.createTempFile(dir, "test", null);
-        Files.delete(test);
-    }
 
     /** Распаковка одного файла из InputStream */
     public static void extractResource(InputStream in, Path target) throws IOException {
@@ -44,14 +27,6 @@ public class RuntimeSetup {
     /** Основной метод распаковки с прогрессом */
     public static Map<String, Path> setupRuntimeWithProgress() throws IOException, URISyntaxException {
         OperatingSystemDetector.OS os = detectOS();
-        Path baseDir = jarDir();
-
-        try {
-            ensureWritable(baseDir);
-        } catch (Exception e) {
-            baseDir = Path.of(System.getProperty("user.home"), ".cache", "megaUpscale");
-            Files.createDirectories(baseDir);
-        }
 
         Path binDir = baseDir.resolve("bin");
         Path modelsDir = baseDir.resolve("models");
