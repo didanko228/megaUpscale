@@ -14,6 +14,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class MainWindow extends Application {
+    private static Path backendPath;
+    private static Path modelsPath;
+
+    public static void initRuntime(Path backend, Path models) {
+        backendPath = backend;
+        modelsPath = models;
+    }
 
     @Override
     public void start(Stage stage) { // TODO use translations
@@ -76,11 +83,7 @@ public class MainWindow extends Application {
                 protected Void call() throws Exception {
                     try {
                         // create UpscaleService
-                        // TODO: use real paths
-                        Path backend = Paths.get("./backend");
-                        Path modelsDir = Paths.get("./models");
-
-                        UpscaleService service = new UpscaleService(backend, modelsDir);
+                        UpscaleService service = new UpscaleService(backendPath, modelsPath);
 
                         // System.out -> loggerBridge
                         java.io.PrintStream originalOut = System.out;

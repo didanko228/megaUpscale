@@ -23,6 +23,7 @@ public class Main {
         Logger.info("Backend: " + backend);
         Logger.info("Models: " + modelsDir);
 
+        MainWindow.initRuntime(backend, modelsDir);
         MainWindow.launchUI(args);
     }
 }
