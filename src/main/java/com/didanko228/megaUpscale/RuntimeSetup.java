@@ -106,7 +106,7 @@ public class RuntimeSetup {
             Path folder = Paths.get(url.toURI());
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
                 for (Path p : stream) {
-                    if (!Files.isDirectory(p)) files.add(pathInJar + p.getFileName());
+                    if (!Files.isDirectory(p)) files.add(pathInJar + "/" + p.getFileName());
                 }
             }
         }
