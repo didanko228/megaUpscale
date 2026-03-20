@@ -1,6 +1,7 @@
 package com.didanko228.megaUpscale.ui;
 
 import com.didanko228.megaUpscale.Main;
+import com.didanko228.megaUpscale.utils.UpscaleService;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -9,6 +10,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MainWindow extends Application {
 
@@ -48,14 +51,66 @@ public class MainWindow extends Application {
 
         HBox optionsBox = new HBox(10, new Label("Model:"), modelBox, new Label("Scale:"), scaleBox);
 
-        // Start
-        Button startBtn = new Button("Upscale");
-
         // Log
         TextArea logArea = new TextArea();
         LoggerBridge loggerBridge = new LoggerBridge(logArea);
         logArea.setEditable(false);
         logArea.setPrefHeight(300);
+
+        // Start
+        Button startBtn = new Button("Upscale");
+        startBtn.setOnAction(e -> {
+            String inputPath = inputField.getText();
+            String outputPath = outputField.getText();
+            String model = modelBox.getValue();
+            int scale = scaleBox.getValue();
+
+            if (inputPath.isEmpty() || outputPath.isEmpty()) {
+                loggerBridge.log("Input or output path is empty!");
+                return;
+            }
+
+            // create Task
+            javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        // create UpscaleService
+                        // TODO: use real paths
+                        Path backend = Paths.get("./backend");
+                        Path modelsDir = Paths.get("./models");
+
+                        UpscaleService service = new UpscaleService(backend, modelsDir);
+
+                        // System.out -> loggerBridge
+                        java.io.PrintStream originalOut = System.out;
+                        System.setOut(new java.io.PrintStream(new java.io.OutputStream() {
+                            @Override
+                            public void write(int b) {
+                                loggerBridge.log(String.valueOf((char) b));
+                            }
+                        }));
+
+                        // upscale
+                        service.upscale(Paths.get(inputPath),
+                                Paths.get(outputPath),
+                                model,
+                                scale
+                        );
+
+                        System.setOut(originalOut);
+
+                    } catch (Exception ex) {
+                        loggerBridge.log("Error: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+
+            // Start Task in new thread
+            new Thread(task).start();
+        });
 
         root.getChildren().addAll(inputBox, outputBox, optionsBox, startBtn, logArea);
 
