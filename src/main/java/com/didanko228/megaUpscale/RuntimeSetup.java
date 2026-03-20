@@ -27,28 +27,34 @@ public class RuntimeSetup {
     public static Map<String, Path> setupRuntimeWithProgress() throws IOException, URISyntaxException {
         OperatingSystem os = OperatingSystemDetector.detectOS();
 
+        Path baseDir = null;
+
+        if (os == OperatingSystem.WINDOWS) baseDir = Paths.get(System.getenv("APPDATA"), Main.PROJECT_NAME);
+        else if (os == OperatingSystem.MAC) baseDir = Paths.get(System.getProperty("user.home"), "Applications", Main.PROJECT_NAME);
+        else baseDir = Paths.get(System.getProperty("user.home"), ".config", Main.PROJECT_NAME);
+
         Path binDir = baseDir.resolve("bin");
         Path modelsDir = baseDir.resolve("models");
         Files.createDirectories(binDir);
         Files.createDirectories(modelsDir);
 
-        // --- Backend ---
-        Path backendExe;
+        // Backend
+        Path backendBin;
         if (os == OperatingSystem.WINDOWS) {
-            backendExe = binDir.resolve("realesrgan.exe");
-            extractFromJar("/native/windows/realesrgan-ncnn-vulkan.exe", backendExe);
+            backendBin = binDir.resolve("realesrgan.exe");
+            extractFromJar("/native/windows/realesrgan-ncnn-vulkan.exe", backendBin);
             extractFromJar("/native/windows/vcomp140.dll", binDir.resolve("vcomp140.dll"));
         } else if (os == OperatingSystem.MAC) {
-            backendExe = binDir.resolve("realesrgan");
-            extractFromJar("/native/macos/realesrgan-ncnn-vulkan", backendExe);
-            backendExe.toFile().setExecutable(true);
+            backendBin = binDir.resolve("realesrgan");
+            extractFromJar("/native/macos/realesrgan-ncnn-vulkan", backendBin);
+            backendBin.toFile().setExecutable(true);
         } else {
-            backendExe = binDir.resolve("realesrgan");
-            extractFromJar("/native/linux/realesrgan-ncnn-vulkan", backendExe);
-            backendExe.toFile().setExecutable(true);
+            backendBin = binDir.resolve("realesrgan");
+            extractFromJar("/native/linux/realesrgan-ncnn-vulkan", backendBin);
+            backendBin.toFile().setExecutable(true);
         }
 
-        // --- Модели ---
+        // Models
         List<String> modelFiles = listResources("/models");
         int total = modelFiles.size();
         int done = 0;
@@ -65,7 +71,7 @@ public class RuntimeSetup {
         }
 
         Map<String, Path> paths = new HashMap<>();
-        paths.put("backend", backendExe);
+        paths.put("backend", backendBin);
         paths.put("models", modelsDir);
         paths.put("baseDir", baseDir);
         return paths;
