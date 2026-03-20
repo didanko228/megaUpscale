@@ -36,10 +36,20 @@ dependencies {
 
     compileOnly "org.projectlombok:lombok:${project.lombok_version}"
     annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+
+    // Windows
+    implementation "org.openjfx:javafx-controls:${project.javafx_version}:win"
+    implementation "org.openjfx:javafx-fxml:${project.javafx_version}:win"
+    // Linux
+    implementation "org.openjfx:javafx-controls:${project.javafx_version}:linux"
+    implementation "org.openjfx:javafx-fxml:${project.javafx_version}:linux"
+    // macOS
+    implementation "org.openjfx:javafx-controls:${project.javafx_version}:mac"
+    implementation "org.openjfx:javafx-fxml:${project.javafx_version}:mac"
 }
 
 javafx {
-    version = "25.0.2"
+    version = project.javafx_version
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
