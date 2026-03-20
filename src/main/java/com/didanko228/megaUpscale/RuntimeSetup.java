@@ -1,7 +1,8 @@
 package com.didanko228.megaUpscale;
 
 import com.didanko228.megaUpscale.utils.Logger;
-import com.didanko228.megaUpscale.utils.OperatingSystemDetector;
+import com.didanko228.megaUpscale.utils.os.OperatingSystem;
+import com.didanko228.megaUpscale.utils.os.OperatingSystemDetector;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,8 +16,6 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static com.didanko228.megaUpscale.utils.OperatingSystemDetector.detectOS;
-
 public class RuntimeSetup {
 
     /** Распаковка одного файла из InputStream */
@@ -26,7 +25,7 @@ public class RuntimeSetup {
 
     /** Основной метод распаковки с прогрессом */
     public static Map<String, Path> setupRuntimeWithProgress() throws IOException, URISyntaxException {
-        OperatingSystemDetector.OS os = detectOS();
+        OperatingSystem os = OperatingSystemDetector.detectOS();
 
         Path binDir = baseDir.resolve("bin");
         Path modelsDir = baseDir.resolve("models");
@@ -35,11 +34,11 @@ public class RuntimeSetup {
 
         // --- Backend ---
         Path backendExe;
-        if (os == OperatingSystemDetector.OS.WINDOWS) {
+        if (os == OperatingSystem.WINDOWS) {
             backendExe = binDir.resolve("realesrgan.exe");
             extractFromJar("/native/windows/realesrgan-ncnn-vulkan.exe", backendExe);
             extractFromJar("/native/windows/vcomp140.dll", binDir.resolve("vcomp140.dll"));
-        } else if (os == OperatingSystemDetector.OS.MAC) {
+        } else if (os == OperatingSystem.MAC) {
             backendExe = binDir.resolve("realesrgan");
             extractFromJar("/native/macos/realesrgan-ncnn-vulkan", backendExe);
             backendExe.toFile().setExecutable(true);
