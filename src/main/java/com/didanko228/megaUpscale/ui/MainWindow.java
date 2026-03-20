@@ -65,6 +65,7 @@ public class MainWindow extends Application {
         LoggerBridge loggerBridge = new LoggerBridge(logArea);
         logArea.setEditable(false);
         logArea.setPrefHeight(300);
+        VBox.setVgrow(logArea, Priority.ALWAYS);
 
         // Start
         Button startBtn = new Button("Upscale");
@@ -126,10 +127,13 @@ public class MainWindow extends Application {
 
         root.getChildren().addAll(inputBox, outputBox, optionsBox, startBtn, logArea);
 
-        Scene scene = new Scene(root, 600, 450);
+        Scene scene = new Scene(root, 965, 470);
         stage.setTitle(Main.PROJECT_NAME);
         stage.setScene(scene);
         stage.show();
+
+        stage.setMinWidth(965);
+        stage.setMinHeight(470);
     }
 
     public static void launchUI(String[] args) {
