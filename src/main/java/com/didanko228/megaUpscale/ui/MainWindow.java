@@ -31,6 +31,7 @@ public class MainWindow extends Application {
         TextField inputField = new TextField();
         Button inputBtn = new Button("Browse...");
         HBox inputBox = new HBox(5, new Label("Input:"), inputField, inputBtn);
+        HBox.setHgrow(inputField, Priority.ALWAYS);
 
         inputBtn.setOnAction(e -> {
             File file = new FileChooser().showOpenDialog(stage);
@@ -41,6 +42,7 @@ public class MainWindow extends Application {
         TextField outputField = new TextField();
         Button outputBtn = new Button("Save as...");
         HBox outputBox = new HBox(5, new Label("Output:"), outputField, outputBtn);
+        HBox.setHgrow(outputField, Priority.ALWAYS);
 
         outputBtn.setOnAction(e -> {
             File file = new FileChooser().showSaveDialog(stage);
