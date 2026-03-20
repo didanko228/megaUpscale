@@ -53,6 +53,7 @@ public class MainWindow extends Application {
 
         // Log
         TextArea logArea = new TextArea();
+        LoggerBridge loggerBridge = new LoggerBridge(logArea);
         logArea.setEditable(false);
         logArea.setPrefHeight(300);
 
