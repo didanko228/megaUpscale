@@ -9,7 +9,11 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -90,19 +94,20 @@ public class MainWindow extends Application {
 
                         // System.out -> loggerBridge
                         java.io.PrintStream originalOut = System.out;
-                        System.setOut(new java.io.PrintStream(new java.io.OutputStream() {
-                            private StringBuilder buffer = new StringBuilder();
+                        System.setOut(new PrintStream(new OutputStream() {
+                            private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
                             @Override
                             public void write(int b) {
                                 if (b == '\n') {
-                                    loggerBridge.log(buffer.toString());
-                                    buffer.setLength(0);
+                                    String line = buffer.toString(StandardCharsets.UTF_8);
+                                    loggerBridge.log(line);
+                                    buffer.reset();
                                 } else {
-                                    buffer.append((char) b);
+                                    buffer.write(b);
                                 }
                             }
-                        }));
+                        }, true, StandardCharsets.UTF_8));
 
                         // upscale
                         service.upscale(Paths.get(inputPath),
@@ -125,6 +130,7 @@ public class MainWindow extends Application {
             new Thread(task).start();
         });
 
+        // clearLog
         Button clearLogBtn = new Button("Clear Log");
         clearLogBtn.setOnAction(e -> logArea.clear());
 
