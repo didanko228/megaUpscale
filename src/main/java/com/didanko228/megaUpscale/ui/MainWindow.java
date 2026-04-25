@@ -59,30 +59,6 @@ public class MainWindow extends Application {
             if (file != null) outputField.setText(file.getAbsolutePath());
         });
 
-        // InputField Listener
-        inputField.textProperty().addListener((obs, oldVal, newVal) -> {
-            Path path = Paths.get(newVal);
-
-            if (Files.exists(path)) {
-                try {
-                    ImageUtils.ImageSize size = ImageUtils.getImageSize(new File(path.toString()));
-
-                    int width = size.width();
-                    int height = size.height();
-
-                    Path outPath = addSuffix(path, "_upscaled");
-                    outputField.setText(outPath.toString());
-                    imageSize.setText(width + "x" + height); // TODO: + " -> " + (width * newValue) + "x" + (height * newValue)
-                } catch (Exception e) {
-                    outputField.setText("");
-                    imageSize.setText("");
-                }
-            } else {
-                outputField.setText("");
-                imageSize.setText("");
-            }
-        });
-
         // Model and Scale
         ComboBox<String> modelBox = new ComboBox<>();
         ModelRegistry registry = new ModelRegistry(modelsPath.getParent());
@@ -101,34 +77,6 @@ public class MainWindow extends Application {
         }
 
         scaleBox.getSelectionModel().selectFirst();
-
-        // modelBox Listener
-        modelBox.valueProperty().addListener((obs, oldValue, newValue) -> {
-            scaleBox.getItems().clear();
-
-            ModelInfo newModel = registry.getByName(newValue);
-
-            for (int i = newModel.scale; i <= 20; i += newModel.scale) {
-                scaleBox.getItems().add(i);
-            }
-
-            scaleBox.getSelectionModel().selectFirst();
-        });
-
-        // scaleBox Listener
-        scaleBox.valueProperty().addListener((obs, oldValue, newValue) -> {
-            ImageUtils.ImageSize size = null;
-            try {
-                size = ImageUtils.getImageSize(new File(inputField.getText()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            int width = size.width();
-            int height = size.height();
-
-            imageSize.setText(width + "x" + height + " -> " + (width * newValue) + "x" + (height * newValue));
-        });
 
         HBox optionsBox = new HBox(10, new Label("Model:"), modelBox, new Label("Scale:"), scaleBox);
 
@@ -213,6 +161,61 @@ public class MainWindow extends Application {
 
         stage.setMinWidth(965);
         stage.setMinHeight(470);
+
+        // modelBox Listener
+        modelBox.valueProperty().addListener((obs, oldValue, newValue) -> {
+            scaleBox.getItems().clear();
+
+            ModelInfo newModel = registry.getByName(newValue);
+
+            for (int i = newModel.scale; i <= 20; i += newModel.scale) {
+                scaleBox.getItems().add(i);
+            }
+
+            scaleBox.getSelectionModel().selectFirst();
+        });
+
+        // scaleBox Listener
+        scaleBox.valueProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue == null) return;
+
+            ImageUtils.ImageSize size = null;
+            try {
+                size = ImageUtils.getImageSize(new File(inputField.getText()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            int width = size.width();
+            int height = size.height();
+
+            imageSize.setText(width + "x" + height + " -> " + (width * newValue) + "x" + (height * newValue));
+        });
+
+        // InputField Listener
+        inputField.textProperty().addListener((obs, oldVal, newVal) -> {
+            Path path = Paths.get(newVal);
+
+            if (Files.exists(path)) {
+                try {
+                    ImageUtils.ImageSize size = ImageUtils.getImageSize(new File(path.toString()));
+
+                    int width = size.width();
+                    int height = size.height();
+                    int scale = scaleBox.getValue();
+
+                    Path outPath = addSuffix(path, "_upscaled");
+                    outputField.setText(outPath.toString());
+                    imageSize.setText(width + "x" + height + " -> " + (width * scale) + "x" + (height * scale));
+                } catch (Exception e) {
+                    outputField.setText("");
+                    imageSize.setText("");
+                }
+            } else {
+                outputField.setText("");
+                imageSize.setText("");
+            }
+        });
     }
 
     public static void launchUI(String[] args) {
