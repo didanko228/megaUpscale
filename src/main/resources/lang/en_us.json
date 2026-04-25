@@ -1,3 +1,11 @@
 {
-  "helloworld": "Hello World!"
+  "main.language.label": "Select language:",
+  "main.input.label": "Input:",
+  "main.input.btn": "Browse...",
+  "main.output.label": "Output:",
+  "main.output.btn": "Save as...",
+  "main.model.label": "Model:",
+  "main.scale.label": "Scale:",
+  "main.start.btn": "Upscale",
+  "main.clearlog.btn": "Clear Log"
 }

@@ -1,3 +1,11 @@
 {
-  "helloworld": "Привет, Мир!"
+  "main.language.label": "Выберите язык:",
+  "main.input.label": "Вход:",
+  "main.input.btn": "Обзор...",
+  "main.output.label": "Выход:",
+  "main.output.btn": "Сохранить как...",
+  "main.model.label": "Модель:",
+  "main.scale.label": "Масштаб:",
+  "main.start.btn": "Начать",
+  "main.clearlog.btn": "Очистить журнал"
 }
