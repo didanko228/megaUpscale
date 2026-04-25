@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -51,6 +52,18 @@ public class MainWindow extends Application {
         outputBtn.setOnAction(e -> {
             File file = new FileChooser().showSaveDialog(stage);
             if (file != null) outputField.setText(file.getAbsolutePath());
+        });
+
+        // InputField Listener
+        inputField.textProperty().addListener((obs, oldVal, newVal) -> {
+            Path path = Paths.get(newVal);
+
+            if (Files.exists(path)) {
+                Path outPath = addSuffix(path, "_upscaled");
+                outputField.setText(outPath.toString());
+            } else {
+                outputField.setText("");
+            }
         });
 
         // Model and Scale
@@ -149,5 +162,15 @@ public class MainWindow extends Application {
 
     public static void launchUI(String[] args) {
         launch(args);
+    }
+
+    private static Path addSuffix(Path path, String suffix) {
+        String fileName = path.getFileName().toString();
+
+        int dotIndex = fileName.lastIndexOf('.');
+        String name = (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
+        String ext = (dotIndex == -1) ? "" : fileName.substring(dotIndex);
+
+        return path.resolveSibling(name + suffix + ext);
     }
 }
