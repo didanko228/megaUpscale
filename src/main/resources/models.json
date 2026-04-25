@@ -1,0 +1,86 @@
+[
+  {
+    "name": "4x_NMKD-Siax_200k",
+    "file": "4x_NMKD-Siax_200k.bin",
+    "param": "4x_NMKD-Siax_200k.param",
+    "scale": 4
+  },
+  {
+    "name": "4x_NMKD-Superscale-SP_178000_G",
+    "file": "4x_NMKD-Superscale-SP_178000_G.bin",
+    "param": "4x_NMKD-Superscale-SP_178000_G.param",
+    "scale": 4
+  },
+  {
+    "name": "4xHFA2k",
+    "file": "4xHFA2k.bin",
+    "param": "4xHFA2k.param",
+    "scale": 4
+  },
+  {
+    "name": "4xLSDIR",
+    "file": "4xLSDIR.bin",
+    "param": "4xLSDIR.param",
+    "scale": 4
+  },
+  {
+    "name": "4xLSDIRCompactC3",
+    "file": "4xLSDIRCompactC3.bin",
+    "param": "4xLSDIRCompactC3.param",
+    "scale": 4
+  },
+  {
+    "name": "4xLSDIRplusC",
+    "file": "4xLSDIRplusC.bin",
+    "param": "4xLSDIRplusC.param",
+    "scale": 4
+  },
+  {
+    "name": "4xNomos8kSC",
+    "file": "4xNomos8kSC.bin",
+    "param": "4xNomos8kSC.param",
+    "scale": 4
+  },
+  {
+    "name": "realesr-animevideov3-x2",
+    "file": "realesr-animevideov3-x2.bin",
+    "param": "realesr-animevideov3-x2.param",
+    "scale": 2
+  },
+  {
+    "name": "realesr-animevideov3-x3",
+    "file": "realesr-animevideov3-x3.bin",
+    "param": "realesr-animevideov3-x3.param",
+    "scale": 3
+  },
+  {
+    "name": "realesr-animevideov3-x4",
+    "file": "realesr-animevideov3-x4.bin",
+    "param": "realesr-animevideov3-x4.param",
+    "scale": 4
+  },
+  {
+    "name": "RealESRGAN_General_WDN_x4_v3",
+    "file": "RealESRGAN_General_WDN_x4_v3.bin",
+    "param": "RealESRGAN_General_WDN_x4_v3.param",
+    "scale": 4
+  },
+  {
+    "name": "RealESRGAN_General_x4_v3",
+    "file": "RealESRGAN_General_x4_v3.bin",
+    "param": "RealESRGAN_General_x4_v3.param",
+    "scale": 4
+  },
+  {
+    "name": "uniscale_restore",
+    "file": "uniscale_restore.bin",
+    "param": "uniscale_restore.param",
+    "scale": 4
+  },
+  {
+    "name": "unknown-2.0.1",
+    "file": "unknown-2.0.1.bin",
+    "param": "unknown-2.0.1.param",
+    "scale": 4
+  }
+]

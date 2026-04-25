@@ -27,7 +27,7 @@ public class RuntimeSetup {
     public static Map<String, Path> setupRuntimeWithProgress() throws IOException, URISyntaxException {
         OperatingSystem os = OperatingSystemDetector.detectOS();
 
-        Path baseDir = null;
+        Path baseDir;
 
         if (os == OperatingSystem.WINDOWS) baseDir = Paths.get(System.getenv("APPDATA"), Main.PROJECT_NAME);
         else if (os == OperatingSystem.MAC) baseDir = Paths.get(System.getProperty("user.home"), "Applications", Main.PROJECT_NAME);
@@ -58,6 +58,11 @@ public class RuntimeSetup {
         List<String> modelFiles = listResources("/models");
         int total = modelFiles.size();
         int done = 0;
+
+        if (!Files.exists(baseDir.resolve("models.json"))) {
+            extractFromJar("/models.json", baseDir.resolve("models.json"));
+            Logger.info("models.json unpacked!");
+        }
 
         for (String modelPath : modelFiles) {
             String name = Paths.get(modelPath).getFileName().toString();

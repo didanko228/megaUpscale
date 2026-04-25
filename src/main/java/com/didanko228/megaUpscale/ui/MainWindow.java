@@ -2,6 +2,8 @@ package com.didanko228.megaUpscale.ui;
 
 import com.didanko228.megaUpscale.Main;
 import com.didanko228.megaUpscale.utils.ImageUtils;
+import com.didanko228.megaUpscale.utils.ModelInfo;
+import com.didanko228.megaUpscale.utils.ModelRegistry;
 import com.didanko228.megaUpscale.utils.UpscaleService;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -29,7 +31,7 @@ public class MainWindow extends Application {
     }
 
     @Override
-    public void start(Stage stage) { // TODO use translations
+    public void start(Stage stage) throws Exception { // TODO use translations
         VBox root = new VBox(10);
         root.setPadding(new javafx.geometry.Insets(10));
 
@@ -70,7 +72,7 @@ public class MainWindow extends Application {
 
                     Path outPath = addSuffix(path, "_upscaled");
                     outputField.setText(outPath.toString());
-                    imageSize.setText(width + "x" + height);
+                    imageSize.setText(width + "x" + height); // TODO: + " -> " + (width * newValue) + "x" + (height * newValue)
                 } catch (Exception e) {
                     outputField.setText("");
                     imageSize.setText("");
@@ -83,12 +85,50 @@ public class MainWindow extends Application {
 
         // Model and Scale
         ComboBox<String> modelBox = new ComboBox<>();
-        modelBox.getItems().addAll("4xLSDIR"); // TODO choose model
+        ModelRegistry registry = new ModelRegistry(modelsPath.getParent());
+
+        for (ModelInfo model : registry.getModels()) {
+            modelBox.getItems().add(model.name);
+        }
         modelBox.getSelectionModel().selectFirst();
 
         ComboBox<Integer> scaleBox = new ComboBox<>();
-        scaleBox.getItems().addAll(2, 3, 4);
+        String nameFirstModel = modelBox.getItems().getFirst();
+        ModelInfo firstModel = registry.getByName(nameFirstModel);
+
+        for (int i = firstModel.scale; i <= 20; i += firstModel.scale) {
+            scaleBox.getItems().add(i);
+        }
+
         scaleBox.getSelectionModel().selectFirst();
+
+        // modelBox Listener
+        modelBox.valueProperty().addListener((obs, oldValue, newValue) -> {
+            scaleBox.getItems().clear();
+
+            ModelInfo newModel = registry.getByName(newValue);
+
+            for (int i = newModel.scale; i <= 20; i += newModel.scale) {
+                scaleBox.getItems().add(i);
+            }
+
+            scaleBox.getSelectionModel().selectFirst();
+        });
+
+        // scaleBox Listener
+        scaleBox.valueProperty().addListener((obs, oldValue, newValue) -> {
+            ImageUtils.ImageSize size = null;
+            try {
+                size = ImageUtils.getImageSize(new File(inputField.getText()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            int width = size.width();
+            int height = size.height();
+
+            imageSize.setText(width + "x" + height + " -> " + (width * newValue) + "x" + (height * newValue));
+        });
 
         HBox optionsBox = new HBox(10, new Label("Model:"), modelBox, new Label("Scale:"), scaleBox);
 
