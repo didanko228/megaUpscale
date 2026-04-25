@@ -1,6 +1,7 @@
 package com.didanko228.megaUpscale.ui;
 
 import com.didanko228.megaUpscale.Main;
+import com.didanko228.megaUpscale.utils.ImageUtils;
 import com.didanko228.megaUpscale.utils.UpscaleService;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -32,6 +33,8 @@ public class MainWindow extends Application {
         VBox root = new VBox(10);
         root.setPadding(new javafx.geometry.Insets(10));
 
+        Label imageSize = new Label(""); // for buttonHBox
+
         // Input
         TextField inputField = new TextField();
         Button inputBtn = new Button("Browse...");
@@ -59,10 +62,22 @@ public class MainWindow extends Application {
             Path path = Paths.get(newVal);
 
             if (Files.exists(path)) {
-                Path outPath = addSuffix(path, "_upscaled");
-                outputField.setText(outPath.toString());
+                try {
+                    ImageUtils.ImageSize size = ImageUtils.getImageSize(new File(path.toString()));
+
+                    int width = size.width();
+                    int height = size.height();
+
+                    Path outPath = addSuffix(path, "_upscaled");
+                    outputField.setText(outPath.toString());
+                    imageSize.setText(width + "x" + height);
+                } catch (Exception e) {
+                    outputField.setText("");
+                    imageSize.setText("");
+                }
             } else {
                 outputField.setText("");
+                imageSize.setText("");
             }
         });
 
@@ -147,7 +162,7 @@ public class MainWindow extends Application {
         Button clearLogBtn = new Button("Clear Log");
         clearLogBtn.setOnAction(e -> logArea.clear());
 
-        HBox buttonHBox = new HBox(5, startBtn, clearLogBtn);
+        HBox buttonHBox = new HBox(5, startBtn, clearLogBtn, imageSize);
 
         root.getChildren().addAll(inputBox, outputBox, optionsBox, buttonHBox, logArea);
 
