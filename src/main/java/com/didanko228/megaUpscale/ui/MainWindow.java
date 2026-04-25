@@ -125,7 +125,12 @@ public class MainWindow extends Application {
             new Thread(task).start();
         });
 
-        root.getChildren().addAll(inputBox, outputBox, optionsBox, startBtn, logArea);
+        Button clearLogBtn = new Button("Clear Log");
+        clearLogBtn.setOnAction(e -> logArea.clear());
+
+        HBox buttonHBox = new HBox(5, startBtn, clearLogBtn);
+
+        root.getChildren().addAll(inputBox, outputBox, optionsBox, buttonHBox, logArea);
 
         Scene scene = new Scene(root, 965, 470);
         stage.setTitle(Main.PROJECT_NAME);
