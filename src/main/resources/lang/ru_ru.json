@@ -1,4 +1,5 @@
 {
+  "main.language.set": "Для изменения языка требуется перезагрузка программы.",
   "main.language.label": "Выберите язык:",
   "main.input.label": "Вход:",
   "main.input.btn": "Обзор...",

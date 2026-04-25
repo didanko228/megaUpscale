@@ -1,4 +1,5 @@
 {
+  "main.language.set": "For language change, restart the program.",
   "main.language.label": "Select language:",
   "main.input.label": "Input:",
   "main.input.btn": "Browse...",

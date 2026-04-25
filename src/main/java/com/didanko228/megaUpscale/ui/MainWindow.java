@@ -48,13 +48,22 @@ public class MainWindow extends Application {
         ComboBox<String> languageComboBox = new ComboBox<>();
         languageComboBox.getItems().addAll(languages);
         languageComboBox.getSelectionModel().select(config.language);
+        Label languageLabel = new Label();
 
-        HBox languageBox = new HBox(5, new Label(TranslationManager.translate(languageComboBox.getValue(), "main.language.label")), languageComboBox);
+        HBox languageBox = new HBox(5,
+                new Label(TranslationManager.translate(languageComboBox.getValue(), "main.language.label")),
+                languageComboBox,
+                languageLabel
+        );
 
         // Input
         TextField inputField = new TextField();
         Button inputBtn = new Button(TranslationManager.translate(languageComboBox.getValue(), "main.input.btn"));
-        HBox inputBox = new HBox(5, new Label(TranslationManager.translate(languageComboBox.getValue(), "main.input.label")), inputField, inputBtn);
+        HBox inputBox = new HBox(5,
+                new Label(TranslationManager.translate(languageComboBox.getValue(), "main.input.label")),
+                inputField,
+                inputBtn
+        );
         HBox.setHgrow(inputField, Priority.ALWAYS);
 
         inputBtn.setOnAction(e -> {
@@ -65,7 +74,11 @@ public class MainWindow extends Application {
         // Output
         TextField outputField = new TextField();
         Button outputBtn = new Button(TranslationManager.translate(languageComboBox.getValue(), "main.output.btn"));
-        HBox outputBox = new HBox(5, new Label(TranslationManager.translate(languageComboBox.getValue(), "main.output.label")), outputField, outputBtn);
+        HBox outputBox = new HBox(5,
+                new Label(TranslationManager.translate(languageComboBox.getValue(), "main.output.label")),
+                outputField,
+                outputBtn
+        );
         HBox.setHgrow(outputField, Priority.ALWAYS);
 
         outputBtn.setOnAction(e -> {
@@ -212,6 +225,7 @@ public class MainWindow extends Application {
         languageComboBox.valueProperty().addListener((obs, oldValue, newValue) -> {
             config.language = newValue;
             ConfigManager.saveConfig(config, new File(basePath.toFile(), "config.json"));
+            languageLabel.setText(TranslationManager.translate(languageComboBox.getValue(), "main.language.set"));
         });
 
         // modelBox Listener
