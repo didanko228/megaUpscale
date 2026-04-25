@@ -31,7 +31,10 @@ public class MainWindow extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception { // TODO use translations
+    public void start(Stage stage) throws Exception {
+        // TODO use translations
+        ModelRegistry registry = new ModelRegistry(modelsPath.getParent());
+
         VBox root = new VBox(10);
         root.setPadding(new javafx.geometry.Insets(10));
 
@@ -61,7 +64,6 @@ public class MainWindow extends Application {
 
         // Model and Scale
         ComboBox<String> modelBox = new ComboBox<>();
-        ModelRegistry registry = new ModelRegistry(modelsPath.getParent());
 
         for (ModelInfo model : registry.getModels()) {
             modelBox.getItems().add(model.name);
@@ -72,9 +74,7 @@ public class MainWindow extends Application {
         String nameFirstModel = modelBox.getItems().getFirst();
         ModelInfo firstModel = registry.getByName(nameFirstModel);
 
-        for (int i = firstModel.scale; i <= 20; i += firstModel.scale) {
-            scaleBox.getItems().add(i);
-        }
+        addScaleOptions(scaleBox, firstModel, 5);
 
         scaleBox.getSelectionModel().selectFirst();
 
@@ -92,7 +92,11 @@ public class MainWindow extends Application {
         startBtn.setOnAction(e -> {
             String inputPath = inputField.getText();
             String outputPath = outputField.getText();
+            Path input = Paths.get(inputPath);
+            Path output = Paths.get(outputPath);
+
             String model = modelBox.getValue();
+            ModelInfo modelInfo = registry.getByName(model);
             int scale = scaleBox.getValue();
 
             if (inputPath.isEmpty() || outputPath.isEmpty()) {
@@ -125,12 +129,41 @@ public class MainWindow extends Application {
                             }
                         }, true, StandardCharsets.UTF_8));
 
-                        // upscale
-                        service.upscale(Paths.get(inputPath),
-                                Paths.get(outputPath),
-                                model,
-                                scale
-                        );
+                        int countScale = 0;
+                        int current = 1;
+
+                        while (current < scale) {
+                            current *= modelInfo.scale;
+                            countScale++;
+                        }
+
+                        Path currentInput = input;
+
+                        for (int i = 1; i <= countScale; i++) {
+                            loggerBridge.log("Upscaling... " + i + " of " + countScale);
+
+                            Path currentOutput;
+
+                            if (i == countScale) {
+                                currentOutput = output; // финальный файл
+                            } else {
+                                currentOutput = Files.createTempFile("upscale_step_" + i, ".png");
+                            }
+
+                            service.upscale(
+                                    currentInput,
+                                    currentOutput,
+                                    model,
+                                    modelInfo.scale
+                            );
+
+                            // удалить предыдущий временный файл
+                            if (!currentInput.equals(input)) {
+                                Files.deleteIfExists(currentInput);
+                            }
+
+                            currentInput = currentOutput;
+                        }
 
                         System.setOut(originalOut);
 
@@ -168,9 +201,7 @@ public class MainWindow extends Application {
 
             ModelInfo newModel = registry.getByName(newValue);
 
-            for (int i = newModel.scale; i <= 20; i += newModel.scale) {
-                scaleBox.getItems().add(i);
-            }
+            addScaleOptions(scaleBox, newModel, 5);
 
             scaleBox.getSelectionModel().selectFirst();
         });
@@ -230,5 +261,14 @@ public class MainWindow extends Application {
         String ext = (dotIndex == -1) ? "" : fileName.substring(dotIndex);
 
         return path.resolveSibling(name + suffix + ext);
+    }
+
+    private static void addScaleOptions(ComboBox<Integer> scaleBox, ModelInfo modelInfo, int countOptions) {
+        int a = modelInfo.scale;
+
+        for (int i = 1; i <= countOptions; i++) {
+            scaleBox.getItems().add(a);
+            a *= modelInfo.scale;
+        }
     }
 }
