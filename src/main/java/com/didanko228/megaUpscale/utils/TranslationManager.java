@@ -2,18 +2,19 @@ package com.didanko228.megaUpscale.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import lombok.Getter;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.jar.JarFile;
 
 public class TranslationManager {
     private static final Map<String, Map<String, String>> translations = new HashMap<>();
+    @Getter
+    private static final List<String> languages = new ArrayList<>();
     public static final String DEFAULT_LANGUAGE = "en_us";
 
     public static void loadTranslations() {
@@ -60,6 +61,7 @@ public class TranslationManager {
                 new TypeToken<Map<String, String>>() {}.getType()
         );
         translations.put(locale, map);
+        languages.add(locale);
         Logger.info("[TranslationManager] Loaded locale: " + locale);
     }
 

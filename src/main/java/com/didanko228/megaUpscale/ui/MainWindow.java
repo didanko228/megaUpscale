@@ -1,10 +1,9 @@
 package com.didanko228.megaUpscale.ui;
 
 import com.didanko228.megaUpscale.Main;
-import com.didanko228.megaUpscale.utils.ImageUtils;
-import com.didanko228.megaUpscale.utils.ModelInfo;
-import com.didanko228.megaUpscale.utils.ModelRegistry;
-import com.didanko228.megaUpscale.utils.UpscaleService;
+import com.didanko228.megaUpscale.config.Config;
+import com.didanko228.megaUpscale.config.ConfigManager;
+import com.didanko228.megaUpscale.utils.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -20,30 +19,42 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class MainWindow extends Application {
+    private static Path basePath;
     private static Path backendPath;
     private static Path modelsPath;
+    private static Config config;
 
-    public static void initRuntime(Path backend, Path models) {
+    public static void initRuntime(Path baseDir, Path backend, Path models, Config configuration) {
+        basePath = baseDir;
         backendPath = backend;
         modelsPath = models;
+        config = configuration;
     }
 
     @Override
     public void start(Stage stage) throws Exception {
-        // TODO use translations
-        ModelRegistry registry = new ModelRegistry(modelsPath.getParent());
+        ModelRegistry registry = new ModelRegistry(basePath);
 
         VBox root = new VBox(10);
         root.setPadding(new javafx.geometry.Insets(10));
 
         Label imageSize = new Label(""); // for buttonHBox
 
+        // Language
+        List<String> languages = TranslationManager.getLanguages();
+        ComboBox<String> languageComboBox = new ComboBox<>();
+        languageComboBox.getItems().addAll(languages);
+        languageComboBox.getSelectionModel().select(config.language);
+
+        HBox languageBox = new HBox(5, new Label(TranslationManager.translate(languageComboBox.getValue(), "main.language.label")), languageComboBox);
+
         // Input
         TextField inputField = new TextField();
-        Button inputBtn = new Button("Browse...");
-        HBox inputBox = new HBox(5, new Label("Input:"), inputField, inputBtn);
+        Button inputBtn = new Button(TranslationManager.translate(languageComboBox.getValue(), "main.input.btn"));
+        HBox inputBox = new HBox(5, new Label(TranslationManager.translate(languageComboBox.getValue(), "main.input.label")), inputField, inputBtn);
         HBox.setHgrow(inputField, Priority.ALWAYS);
 
         inputBtn.setOnAction(e -> {
@@ -53,8 +64,8 @@ public class MainWindow extends Application {
 
         // Output
         TextField outputField = new TextField();
-        Button outputBtn = new Button("Save as...");
-        HBox outputBox = new HBox(5, new Label("Output:"), outputField, outputBtn);
+        Button outputBtn = new Button(TranslationManager.translate(languageComboBox.getValue(), "main.output.btn"));
+        HBox outputBox = new HBox(5, new Label(TranslationManager.translate(languageComboBox.getValue(), "main.output.label")), outputField, outputBtn);
         HBox.setHgrow(outputField, Priority.ALWAYS);
 
         outputBtn.setOnAction(e -> {
@@ -78,7 +89,9 @@ public class MainWindow extends Application {
 
         scaleBox.getSelectionModel().selectFirst();
 
-        HBox optionsBox = new HBox(10, new Label("Model:"), modelBox, new Label("Scale:"), scaleBox);
+        HBox optionsBox = new HBox(10,
+                new Label(TranslationManager.translate(languageComboBox.getValue(), "main.model.label")), modelBox,
+                new Label(TranslationManager.translate(languageComboBox.getValue(), "main.scale.label")), scaleBox);
 
         // Log
         TextArea logArea = new TextArea();
@@ -88,7 +101,7 @@ public class MainWindow extends Application {
         VBox.setVgrow(logArea, Priority.ALWAYS);
 
         // Start
-        Button startBtn = new Button("Upscale");
+        Button startBtn = new Button(TranslationManager.translate(languageComboBox.getValue(), "main.start.btn"));
         startBtn.setOnAction(e -> {
             String inputPath = inputField.getText();
             String outputPath = outputField.getText();
@@ -180,12 +193,12 @@ public class MainWindow extends Application {
         });
 
         // clearLog
-        Button clearLogBtn = new Button("Clear Log");
+        Button clearLogBtn = new Button(TranslationManager.translate(languageComboBox.getValue(), "main.clearlog.btn"));
         clearLogBtn.setOnAction(e -> logArea.clear());
 
         HBox buttonHBox = new HBox(5, startBtn, clearLogBtn, imageSize);
 
-        root.getChildren().addAll(inputBox, outputBox, optionsBox, buttonHBox, logArea);
+        root.getChildren().addAll(languageBox, inputBox, outputBox, optionsBox, buttonHBox, logArea);
 
         Scene scene = new Scene(root, 965, 470);
         stage.setTitle(Main.PROJECT_NAME);
@@ -194,6 +207,12 @@ public class MainWindow extends Application {
 
         stage.setMinWidth(965);
         stage.setMinHeight(470);
+
+        // languageComboBox Listener
+        languageComboBox.valueProperty().addListener((obs, oldValue, newValue) -> {
+            config.language = newValue;
+            ConfigManager.saveConfig(config, new File(basePath.toFile(), "config.json"));
+        });
 
         // modelBox Listener
         modelBox.valueProperty().addListener((obs, oldValue, newValue) -> {
