@@ -24,7 +24,12 @@ case "$OS" in
       --main-class $MAIN_CLASS \
       --app-version $VERSION \
       --type exe \
-      --dest build/dest/windows
+      --dest build/dest/windows \
+      --win-dir-chooser \
+      --win-per-user-install \
+      --win-shortcut-prompt \
+      --win-menu \
+      --win-upgrade-uuid019e061e-1ba3-7141-a767-a9e704d38124
     ;;
   linux)
     jpackage \
