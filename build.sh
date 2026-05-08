@@ -29,7 +29,7 @@ case "$OS" in
       --win-per-user-install \
       --win-shortcut-prompt \
       --win-menu \
-      --win-upgrade-uuid019e061e-1ba3-7141-a767-a9e704d38124
+      --win-upgrade-uuid 019e061e-1ba3-7141-a767-a9e704d38124
     ;;
   linux)
     jpackage \
