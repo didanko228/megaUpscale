@@ -25,8 +25,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fakeroot binutils
 
-      - name: Build app
-        run: ./gradlew shadowJar
+      - name: Make build script executable
+        run: chmod +x build.sh
 
       - name: Build Linux package
         run: ./build.sh linux
@@ -51,10 +51,6 @@ jobs:
           distribution: zulu
           java-version: 25
 
-      - name: Build app
-        shell: bash
-        run: ./gradlew shadowJar
-
       - name: Build Windows package
         shell: bash
         run: ./build.sh windows
@@ -65,7 +61,7 @@ jobs:
           name: windows-installer
           path: build/dest/windows/
 
-  build-macos:
+  build-macos-arm64:
     runs-on: macos-latest
 
     steps:
@@ -79,20 +75,54 @@ jobs:
           distribution: zulu
           java-version: 25
 
-      - name: Build app
-        run: ./gradlew shadowJar
+      - name: Make build script executable
+        run: chmod +x build.sh
 
       - name: Build macOS package
         run: ./build.sh mac
 
+      - name: Rename dmg
+        run: |
+          mv build/dest/mac/*.dmg build/dest/mac/megaUpscale-macos-arm64.dmg
+
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mac-installer
+          name: mac-arm64-installer
+          path: build/dest/mac/
+
+  build-macos-intel:
+    runs-on: macos-26-intel
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+
+      - name: Make build script executable
+        run: chmod +x build.sh
+
+      - name: Build macOS package
+        run: ./build.sh mac
+
+      - name: Rename dmg
+        run: |
+          mv build/dest/mac/*.dmg build/dest/mac/megaUpscale-macos-intel.dmg
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-intel-installer
           path: build/dest/mac/
 
   release:
-    needs: [build-linux, build-windows, build-macos]
+    needs: [build-linux, build-windows, build-macos-arm64, build-macos-intel]
     runs-on: ubuntu-latest
 
     steps:
@@ -108,11 +138,17 @@ jobs:
           name: windows-installer
           path: dist/windows
 
-      - name: Download macOS artifact
+      - name: Download macOS arm64 artifact
         uses: actions/download-artifact@v4
         with:
-          name: mac-installer
-          path: dist/mac
+          name: mac-arm64-installer
+          path: dist/mac/arm64
+
+      - name: Download macOS intel artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-intel-installer
+          path: dist/mac/intel
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
